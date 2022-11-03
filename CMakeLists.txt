@@ -10,6 +10,7 @@ project(can2piros)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  ros_canopen
 )
 
 ## System dependencies are found with CMake's conventions

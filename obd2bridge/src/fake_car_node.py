@@ -174,7 +174,7 @@ if __name__ == '__main__':
         try:
                 if(can_interface == 'vcan0'):
                         bus = can.interface.Bus(channel=can_interface, interface='socketcan')
-                if(can_interface == 'can0'):
+                elif(can_interface == 'can0'):
                         can.interface.Bus(channel='can0', bustype='socketcan_native')
                 else:
                         exit()
@@ -182,7 +182,7 @@ if __name__ == '__main__':
 	        print('Cannot find PiCAN board.')
 	        #GPIO.output(led,False)
 	        exit()
-           obd()
+        obd()
        except rospy.ROSInterruptException:
            pass
        

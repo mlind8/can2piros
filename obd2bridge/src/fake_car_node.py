@@ -64,7 +64,8 @@ PID_REPLY           = 0x7E8
 
 outfile = open('log.txt','w')
 
-
+can_interface = 'vcan0';
+bus = '';
 print('\n\rCAN Rx test')
 print('Bring up CAN0....')
 q = queue.Queue()
@@ -72,13 +73,6 @@ q = queue.Queue()
 #os.system("sudo /sbin/ip link set vcan0 up type can bitrate 500000")
 time.sleep(0.1)	
 print('Ready')
-
-try:
-	bus = can.interface.Bus(channel='vcan0', interface='socketcan')
-except OSError:
-	print('Cannot find PiCAN board.')
-	#GPIO.output(led,False)
-	exit()
 
 def can_rx_task():	# Receive thread
 	while True:
@@ -174,7 +168,20 @@ def obd():
 
 if __name__ == '__main__':
        try:
-           print(sys.argv);
+        print(sys.argv);
+        if(len(sys.argv) >= 2):
+                can_interface = sys.argv[1];
+        try:
+                if(can_interface == 'vcan0'):
+                        bus = can.interface.Bus(channel=can_interface, interface='socketcan')
+                if(can_interface == 'can0'):
+                        can.interface.Bus(channel='can0', bustype='socketcan_native')
+                else:
+                        exit()
+        except OSError:
+	        print('Cannot find PiCAN board.')
+	        #GPIO.output(led,False)
+	        exit()
            obd()
        except rospy.ROSInterruptException:
            pass

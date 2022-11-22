@@ -60,6 +60,8 @@ MAF_SENSOR          = 0x10
 O2_VOLTAGE          = 0x14
 THROTTLE            = 0x11
 
+PRIUS_TEST1          = 0x10
+PRIUS_TEST2         = 0x04
 PID_REQUEST         = 0x7DF
 PID_REPLY           = 0x7E8
 
@@ -86,6 +88,10 @@ def can_rx_task():	# Receive thread
 def can_tx_task():	# Transmit thread
 	while True:
 
+		msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,PRIUS_TEST1,PRIUS_TEST2,0x00,0x00,0x00,0x00],is_extended_id=False)
+		bus.send(msg)
+		time.sleep(0.05)
+                
 		#GPIO.output(led,True)
 		# Sent a Engine coolant temperature request
 		msg = can.Message(arbitration_id=PID_REQUEST,data=[0x02,0x01,ENGINE_COOLANT_TEMP,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
@@ -123,6 +129,7 @@ def obd():
     throttle = 0
     c = ''
     count = 0
+    angle = 0;
     try:
         while True:
             for i in range(4):
@@ -130,7 +137,11 @@ def obd():
                     pass
                 message = q.get()
                 
+                
                 c = '{0:f},{1:d},'.format(message.timestamp,count)
+                if message.arbitration_id == PID_REPLY and message.data[2] == 0x10 and message.data[3] == 0x04:
+                    angle = message.data[4]*256 + message.data[5];
+                    
                 if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_COOLANT_TEMP:
                     temperature = message.data[3] - 40;
 
@@ -145,7 +156,7 @@ def obd():
                 if message.arbitration_id == PID_REPLY and message.data[2] == THROTTLE:
                     throttle = round((message.data[3]*100)/255);					# Conver data to %
 
-            c += '{0:d},{1:d},{2:d},{3:d}'.format(temperature,rpm,speed,throttle)
+            c += '{0:d},{1:d},{2:d},{3:d}, angle:{4:d}'.format(temperature,rpm,speed,throttle,angle)
             pubmsg = Obd2msg(temperature,rpm,speed,throttle);
             #print("we got here");
             print(pubmsg)

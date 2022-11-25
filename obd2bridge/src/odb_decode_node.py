@@ -66,6 +66,8 @@ PID_REPLY           = 0x7E8
 
 outfile = open('log.txt','w')
 
+pidlog = open('pidlog.txt','w')
+
 can_interface = 'vcan0';
 
 q = queue.Queue()
@@ -86,110 +88,112 @@ def can_rx_task():	# Receive thread
 
 def can_tx_task():	# Transmit thread
 	while True:
+                for i in range(0,256):
+                        for j in range(0,256):
+                                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,i,j,0x00,0x00,0x00,0x00],is_extended_id=False)
+                                bus.send(msg)
+                                time.sleep(0.01)
+                                bus.send(msg)
 
-		msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,PRIUS_TEST1,PRIUS_TEST2,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x0,0xaa,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x02,0x60,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x01,0xD2,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x02,0x24,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x02,0x26,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x02,0x83,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x02,0xE6,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x02,0xE7,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x02,0xE4,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x02,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x01,0x28,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x01,0x41,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x01,0x60,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x01,0x61,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x01,0xD2,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x01,0x91,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x03,0x3E,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x03,0x44,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x03,0x65,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x03,0x66,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x03,0x43,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x04,0xCB,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x04,0x70,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x04,0x411,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,0x04,0x12,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x0,0xaa,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x60,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0xD2,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x24,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x26,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x83,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0xE6,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0xE7,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0xE4,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x28,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x41,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x60,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x61,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0xD2,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x91,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x3E,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x44,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x65,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x66,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x43,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x04,0xCB,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x04,0x70,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x04,0x411,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x04,0x12,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
                 
 		#GPIO.output(led,True)
 
 		# Sent a Engine RPM request
-		msg = can.Message(arbitration_id=PID_REQUEST,data=[0x02,0x01,ENGINE_RPM,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x02,0x01,ENGINE_RPM,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
 
 		# Sent a Vehicle speed  request
-		msg = can.Message(arbitration_id=PID_REQUEST,data=[0x02,0x01,VEHICLE_SPEED,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)		
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x02,0x01,VEHICLE_SPEED,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)		
 
 		# Sent a Throttle position request
-		msg = can.Message(arbitration_id=PID_REQUEST,data=[0x02,0x01,THROTTLE,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
-		bus.send(msg)
-		time.sleep(0.05)
+                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x02,0x01,THROTTLE,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
+                bus.send(msg)
+                time.sleep(0.01)
 		
 		#GPIO.output(led,False)
-		time.sleep(0.1)
+                #time.sleep(0.1)
 						
 def obd():
     print("started obd2 logger");
-
+    useful_pid = [0] * (0xff*0xff);
     rx = Thread(target = can_rx_task)  
     rx.start()
     tx = Thread(target = can_tx_task)
@@ -199,6 +203,7 @@ def obd():
     speed = 0
     throttle = 0
     c = ''
+    str = ''
     count = 0
     angle = 0;
     wheel1 = 0;
@@ -213,29 +218,39 @@ def obd():
                 message = q.get()
                 
                 
-                c = '{0:f},{1:d},'.format(message.timestamp,count)
-                if message.arbitration_id == PID_REPLY and message.data[2] == 0x10 and message.data[3] == 0x04:
-                    angle = message.data[4]*256 + message.data[5];
-                    
-                if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_COOLANT_TEMP:
-                    temperature = message.data[3] - 40;
+                c = '{},{},'.format(message.timestamp,count)
+                if message.arbitration_id == PID_REPLY and message.data[1] == 0x62:
+                        if message.data[4] != 0:
+                                od = useful_pid[message.data[1]*message.data[2]];
+                                useful_pid[message.data[1]*message.data[2]] = message.data[4];
+                                str = 'Pid {},{} had something {}, change from previous {}\n'.format(message.data[1],message.data[2],message.data[4],(od - message.data[4]))
+                                print(str);
+                                with open("pidlog.txt", "a") as f:
+                                        f.write(str);
+                                                                              #message.data[1],message.data[2],message.data[4],(od - message.data[4]))
+                    #'Pid {1:d},{2:d} had something {3:d}, change from previous {4:d}'
+                #if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_COOLANT_TEMP:
+                 #   temperature = message.data[3] - 40;
 
                     #Convert data into temperature in degree C
                     
-                if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_RPM:
+                if message.arbitration_id == PID_REPLY and message.data[0] == 5 and message.data[2] == ENGINE_RPM:
                     rpm = round(((message.data[3]*256) + message.data[4])/4);	# Convert data to RPM
                         
-                if message.arbitration_id == PID_REPLY and message.data[2] == VEHICLE_SPEED:
+                if message.arbitration_id == PID_REPLY and message.data[0] == 4 and message.data[2] == VEHICLE_SPEED:
                     speed = message.data[3];										# Convert data to km
                             
-                if message.arbitration_id == PID_REPLY and message.data[2] == THROTTLE:
+                if message.arbitration_id == PID_REPLY and message.data[0] == 4 and message.data[2] == THROTTLE:
                     throttle = round((message.data[3]*100)/255);					# Conver data to %
 
-            c += '{1:d},{2:d},{3:d}, angle:{4:d}'.format(rpm,speed,throttle,angle)
-            pubmsg = Obd2msg(rpm,speed,throttle,angle,wheel1,wheel2,wheel3,wheel4);
+            c += "{},{},{}, angle:{}\n".format(rpm,speed,throttle,angle)
+            #pubmsg = Obd2msg(rpm,speed,throttle,angle,wheel1,wheel2,wheel3,wheel4);
             #print("we got here");
-            print(pubmsg)
-            print(c,file = outfile) # Save data to file
+#            print(pubmsg)
+            print(c)
+            with open("pidlog.txt", "a") as f:
+                    f.write(c);
+#            print(c,file = outfile) # Save data to file
             count += 1
 		
 

@@ -139,6 +139,12 @@ def obd():
                         msg = can.Message(arbitration_id=PID_REPLY,data=[0x02,0x01,ENGINE_RPM,0x20,0x10,0x00,0x00,0x00],is_extended_id=False)
                         bus.send(msg)
                         time.sleep(0.05)
+
+                if message.arbitration_id == PID_REQUEST and message.data[1] == 0x22:
+                        #rpm = round(((message.data[3]*256) + message.data[4])/4);	# Convert data to RPM
+                        msg = can.Message(arbitration_id=PID_REPLY,data=[0x05,0x62,message.data[3],message.data[4],0xff,0x00,0x00,0x00],is_extended_id=False)
+                        bus.send(msg)
+                        time.sleep(0.05)
                         
                 if message.arbitration_id == PID_REQUEST and message.data[2] == VEHICLE_SPEED:
                         msg = can.Message(arbitration_id=PID_REPLY,data=[0x02,0x01,VEHICLE_SPEED,0x43,0x00,0x00,0x00,0x00],is_extended_id=False)

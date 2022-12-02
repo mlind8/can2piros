@@ -79,99 +79,19 @@ print('Bring up CAN0....')
 time.sleep(0.1)	
 print('Ready')
 bus = ''
-        
+
+rx_tsk_run = True;
+tx_tsk_run = True;
+
+
 def can_rx_task():	# Receive thread
-	while True:
+	while rx_tsk_run:
 		message = bus.recv()
 		if message.arbitration_id == PID_REPLY:
 			q.put(message)			# Put message into queue
 
 def can_tx_task():	# Transmit thread
-	while True:
-                for i in range(0,256):
-                        for j in range(0,256):
-                                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x03,0x22,i,j,0x00,0x00,0x00,0x00],is_extended_id=False)
-                                bus.send(msg)
-                                time.sleep(0.01)
-                                bus.send(msg)
-
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x0,0xaa,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x60,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0xD2,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x24,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x26,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x83,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0xE6,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0xE7,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0xE4,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x02,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x28,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x41,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x60,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x61,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0xD2,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x01,0x91,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x3E,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x44,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x65,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x66,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x03,0x43,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x04,0xCB,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x04,0x70,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x04,0x411,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                msg = can.Message(arbitration_id=PID_REQUEST,data=[0x04,0x22,0x04,0x12,0x00,0x00,0x00,0x00],is_extended_id=False)
-                bus.send(msg)
-                time.sleep(0.01)
-                
-		#GPIO.output(led,True)
+	while tx_tsk_run:
 
 		# Sent a Engine RPM request
                 msg = can.Message(arbitration_id=PID_REQUEST,data=[0x02,0x01,ENGINE_RPM,0x00,0x00,0x00,0x00,0x00],is_extended_id=False)
@@ -188,10 +108,12 @@ def can_tx_task():	# Transmit thread
                 bus.send(msg)
                 time.sleep(0.01)
 		
-		#GPIO.output(led,False)
-                #time.sleep(0.1)
+
 						
 def obd():
+    pub = rospy.Publisher("odb2msg",Obd2msg,queue_size=10);
+    rospy.init_node("obd2")
+    rate = rospy.Rate(10)
     print("started obd2 logger");
     useful_pid = [0] * (0xff*0xff);
     rx = Thread(target = can_rx_task)  
@@ -211,56 +133,45 @@ def obd():
     wheel3 = 0;
     wheel4 = 0;
     try:
-        while True:
-            for i in range(4):
-                while(q.empty() == True):	# Wait until there is a message
-                    pass
-                message = q.get()
-                
-                
-                c = '{},{},'.format(message.timestamp,count)
-                if message.arbitration_id == PID_REPLY and message.data[1] == 0x62:
-                        if message.data[4] != 0:
-                                od = useful_pid[message.data[1]*message.data[2]];
-                                useful_pid[message.data[1]*message.data[2]] = message.data[4];
-                                str = 'Pid {},{} had something {}, change from previous {}\n'.format(message.data[1],message.data[2],message.data[4],(od - message.data[4]))
-                                print(str);
-                                with open("pidlog.txt", "a") as f:
-                                        f.write(str);
-                                                                              #message.data[1],message.data[2],message.data[4],(od - message.data[4]))
-                    #'Pid {1:d},{2:d} had something {3:d}, change from previous {4:d}'
-                #if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_COOLANT_TEMP:
-                 #   temperature = message.data[3] - 40;
-
-                    #Convert data into temperature in degree C
-                    
-                if message.arbitration_id == PID_REPLY and message.data[0] == 5 and message.data[2] == ENGINE_RPM:
-                    rpm = round(((message.data[3]*256) + message.data[4])/4);	# Convert data to RPM
+        with open("pidlog.txt", "a") as f:
+                while not rospy.is_shutdown():
+                        for i in range(4):
+                                while(q.empty() == True):	# Wait until there is a message
+                                        pass
+                                message = q.get()
+                                   
+                        if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_RPM:
+                                rpm = round(((message.data[3]*256) + message.data[4])/4);	# Convert data to RPM
                         
-                if message.arbitration_id == PID_REPLY and message.data[0] == 4 and message.data[2] == VEHICLE_SPEED:
-                    speed = message.data[3];										# Convert data to km
-                            
-                if message.arbitration_id == PID_REPLY and message.data[0] == 4 and message.data[2] == THROTTLE:
-                    throttle = round((message.data[3]*100)/255);					# Conver data to %
+                        if message.arbitration_id == PID_REPLY and message.data[2] == VEHICLE_SPEED:
+                                speed = message.data[3];										# Convert data to km                        
+                        if message.arbitration_id == PID_REPLY and message.data[2] == THROTTLE:
+                                throttle = round((message.data[3]*100)/255);					# Conver data to %
 
-            c += "{},{},{}, angle:{}\n".format(rpm,speed,throttle,angle)
-            #pubmsg = Obd2msg(rpm,speed,throttle,angle,wheel1,wheel2,wheel3,wheel4);
-            #print("we got here");
-#            print(pubmsg)
-            print(c)
-            with open("pidlog.txt", "a") as f:
-                    f.write(c);
-#            print(c,file = outfile) # Save data to file
-            count += 1
-		
+                        c = "{},{},{}, angle:{}\n".format(rpm,speed,throttle,angle)
+                        pubmsg = Obd2msg(rpm,speed,throttle,wheel1,wheel2,wheel3,wheel4);
+            
+                        print(pubmsg)
+                        print(c)
+                        f.write(c);
+                        #            print(c,file = outfile) # Save data to file
+                        count += 1
+                        pub.publish(pubmsg);
+                        rate.sleep()
+	    
 
 	
-    except KeyboardInterrupt:
-        #Catch keyboard interrupt
-        #GPIO.output(led,False)
+    except Exception:
+            #Catch keyboard interrupt
+            #GPIO.output(led,False)
         outfile.close()		# Close logger file
         #os.system("sudo /sbin/ip link set can0 down")
-        print('\n\rKeyboard interrtupt')	
+        print('\n\rKeyboard interrtupt')
+        rx_tsk_run = False;
+        tx_tsk_run = False;
+        rx.join()
+        tx.join()
+	
 
 if __name__ == '__main__':
        try:
@@ -272,8 +183,12 @@ if __name__ == '__main__':
         except OSError:
 	        print('Cannot find PiCAN board.')
 	        #GPIO.output(led,False)
-	        exit()
-        obd()
-       except rospy.ROSInterruptException:
+	        exit()        
+        obd();
+        print("exited obd");        
+        rx_tsk_run = False;
+        tx_tsk_run = False;
+        exit();
+       except rospy.ROSInterruptException:               
            pass
        

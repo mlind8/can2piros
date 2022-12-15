@@ -1,0 +1,4 @@
+-
+  ros1_package_name: 'obd2msg'
+  ros2_package_name: 'obd2msg2'
+

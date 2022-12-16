@@ -124,7 +124,7 @@ def replay():
                                         
                                         pubmsg = Obd2msg(parts[1],parts[2],parts[3]);
                                         print(pubmsg);
-                                        #pub.publish(pubmsg);
+                                        pub.publish(pubmsg);
                                         #print("{}\nnewline".format(line));
                                 else:
                                         loopvar = False;

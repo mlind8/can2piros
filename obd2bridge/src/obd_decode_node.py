@@ -160,13 +160,12 @@ def obd():
 
     throttle = 0
     count = 0
-    try:
-        with open(logfile_name, "a") as logfile:
+    with open(logfile_name, "a") as logfile:
+        try:
             while not rospy.is_shutdown():
-                for i in range(4):
-                    while (q.empty() == True):  # Wait until there is a message
-                        pass
-                    message = q.get()
+                while (q.empty() == True):  # Wait until there is a message
+                    pass
+                message = q.get()
 
                 if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_RPM:
                     # Convert data to RPM
@@ -188,13 +187,11 @@ def obd():
                 pub.publish(pubmsg)
                 print(pubmsg)
                 rate.sleep()
-
-    except Exception as e:
-        # Catch keyboard interrupt
-        logfile.close()		# Close logger file
-        print(e)
-        rx_tsk_run = False
-        tx_tsk_run = False
+        except Exception as e:
+            rx_tsk_run = False
+            tx_tsk_run = False
+            rx.join()
+            tx.join()
 
 
 if __name__ == '__main__':

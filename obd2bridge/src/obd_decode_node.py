@@ -43,7 +43,7 @@ import queue
 import rospy
 import sys
 from obd2msg.msg import Obd2msg
-from threading import Thread
+import threading
 
 # For a list of PIDs visit https://en.wikipedia.org/wiki/OBD-II_PIDs
 ENGINE_RPM = 0x0C
@@ -73,25 +73,37 @@ q = queue.Queue()
 bus = ''
 replay_file = ''
 
-rx_tsk_run = True
-tx_tsk_run = True
+
+# A thread that can be stopped an can receive any function as a parameter to run until the stop flag is set
+class StoppableThread(threading.Thread):
+    """Thread class with a stop() method. The thread itself has to check
+    regularly for the stopped() condition."""
+
+    def __init__(self, func, *args, **kwargs):
+        super(StoppableThread, self).__init__(*args, **kwargs)
+        self._stop_event = threading.Event()
+        # pass the _stop_event to the function func
+        self.run = lambda: func(self._stop_event, *args, **kwargs)
+
+    def stop(self):
+        self._stop_event.set()
 
 
-def can_rx_task():  # Receive thread
-    while rx_tsk_run:
+def can_rx_task(event):  # Receive thread
+    while not event.is_set():
         message = bus.recv()
         if message.arbitration_id == PID_REPLY:
             q.put(message)			# Put message into queue
 
 
-def can_tx_task(tx_rate):  # Transmit thread
+def can_tx_task(event, tx_rate):  # Transmit thread
     msg_engine_rpm = can.Message(arbitration_id=PID_REQUEST, data=[
                                     0x02, 0x01, ENGINE_RPM, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
     msg_vehicle_speed = can.Message(arbitration_id=PID_REQUEST, data=[
                                     0x02, 0x01, VEHICLE_SPEED, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
     msg_throttle = can.Message(arbitration_id=PID_REQUEST, data=[
                                     0x02, 0x01, THROTTLE, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
-    while tx_tsk_run:
+    while not event.is_set():
         try:
             # Sent a Engine RPM request
             bus.send(msg_engine_rpm)
@@ -150,9 +162,9 @@ def obd():
     rate = rospy.Rate(TRANSMIT_RATE)
     print("started obd2 logger")
     useful_pid = [0] * (0xff*0xff)
-    rx = Thread(target=can_rx_task)
+    rx = StoppableThread(can_rx_task)
     rx.start()
-    tx = Thread(target=can_tx_task, args=(TRANSMIT_RATE,))
+    tx = StoppableThread(can_tx_task, TRANSMIT_RATE)
     tx.start()
     temperature = 0
     rpm = 0
@@ -188,8 +200,8 @@ def obd():
                 print(pubmsg)
                 rate.sleep()
         except Exception as e:
-            rx_tsk_run = False
-            tx_tsk_run = False
+            rx.stop()
+            tx.stop()
             rx.join()
             tx.join()
 

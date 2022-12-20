@@ -173,8 +173,8 @@ def obd():
     throttle = 0
     count = 0
     with open(logfile_name, "a") as logfile:
-        try:
-            while not rospy.is_shutdown():
+        while not rospy.is_shutdown():
+            try:
                 while (q.empty() == True):  # Wait until there is a message
                     pass
                 message = q.get()
@@ -199,11 +199,12 @@ def obd():
                 pub.publish(pubmsg)
                 print(pubmsg)
                 rate.sleep()
-        except Exception as e:
-            rx.stop()
-            tx.stop()
-            rx.join()
-            tx.join()
+            except:
+                tx.stop()
+                rx.stop()
+                tx.join()
+                rx.join()
+                break
 
 
 if __name__ == '__main__':

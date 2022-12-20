@@ -136,6 +136,8 @@ def replay():
 
                 
 def obd():
+    global rx_tsk_run
+    global tx_tsk_run
     pub = rospy.Publisher("obd2msg",Obd2msg,queue_size=10);
     rospy.init_node("obd2");
     rate = rospy.Rate(10);
@@ -183,8 +185,8 @@ def obd():
         #Catch keyboard interrupt
         logfile.close()		# Close logger file
         print(e)
-        rx_tsk_run = False;
-        tx_tsk_run = False;
+        rx_tsk_run = False
+        tx_tsk_run = False
 	
 
 if __name__ == '__main__':

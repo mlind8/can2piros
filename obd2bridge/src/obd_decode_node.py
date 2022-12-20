@@ -80,7 +80,7 @@ class StoppableThread(threading.Thread):
     regularly for the stopped() condition."""
 
     def __init__(self, func, *args, **kwargs):
-        super(StoppableThread, self).__init__(*args, **kwargs)
+        super(StoppableThread, self).__init__()
         self._stop_event = threading.Event()
         # pass the _stop_event to the function func
         self.run = lambda: func(self._stop_event, *args, **kwargs)

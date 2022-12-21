@@ -91,8 +91,8 @@ class StoppableThread(threading.Thread):
 
 def can_rx_task(event):  # Receive thread
     while not event.is_set():
-        message = bus.recv()
-        if message.arbitration_id == PID_REPLY:
+        message = bus.recv(timeout=0.2)
+        if message and message.arbitration_id == PID_REPLY:
             q.put(message)			# Put message into queue
 
 

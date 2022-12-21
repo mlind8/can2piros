@@ -175,36 +175,37 @@ def obd():
     with open(logfile_name, "a") as logfile:
         while not rospy.is_shutdown():
             try:
-                while (q.empty() == True):  # Wait until there is a message
-                    pass
-                message = q.get()
+                if not q.empty():  # Wait until there is a message
+                    message = q.get()
 
-                if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_RPM:
-                    # Convert data to RPM
-                    rpm = round(((message.data[3]*256) + message.data[4])/4)
+                    if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_RPM:
+                        # Convert data to RPM
+                        rpm = round(((message.data[3]*256) + message.data[4])/4)
 
-                if message.arbitration_id == PID_REPLY and message.data[2] == VEHICLE_SPEED:
-                    speed = message.data[3]										# Convert data to km
-                if message.arbitration_id == PID_REPLY and message.data[2] == THROTTLE:
-                    throttle = round(
-                        (message.data[3]*100)/255)					# Conver data to %
+                    if message.arbitration_id == PID_REPLY and message.data[2] == VEHICLE_SPEED:
+                        speed = message.data[3]										# Convert data to km
+                    if message.arbitration_id == PID_REPLY and message.data[2] == THROTTLE:
+                        throttle = round(
+                            (message.data[3]*100)/255)					# Conver data to %
 
-                pubmsg = Obd2msg(rpm, speed, throttle)
-                logmsg = "{},{},{},{}\n".format(
-                    time.time(), rpm, speed, throttle)
-                print(pubmsg)
-                logfile.write(logmsg)
-                #            print(c,file = outfile) # Save data to file
-                count += 1
-                pub.publish(pubmsg)
-                print(pubmsg)
+                    pubmsg = Obd2msg(rpm, speed, throttle)
+                    logmsg = "{},{},{},{}\n".format(
+                        time.time(), rpm, speed, throttle)
+                    print(pubmsg)
+                    logfile.write(logmsg)
+                    #            print(c,file = outfile) # Save data to file
+                    count += 1
+                    pub.publish(pubmsg)
+                    print(pubmsg)
                 rate.sleep()
             except:
-                tx.stop()
-                rx.stop()
-                tx.join()
-                rx.join()
+                print("Keyboard interrupt")
                 break
+    print("Stopping threads")
+    tx.stop()
+    rx.stop()
+    tx.join()
+    rx.join()
 
 
 if __name__ == '__main__':
@@ -216,8 +217,6 @@ if __name__ == '__main__':
             # timed = time.time() - timen ;
             # print("{},{}".format(timen,timed));
             replay()
-            exit()
-
         elif len(sys.argv) >= 2:  # collection mode
             can_interface = sys.argv[1]
             try:
@@ -225,17 +224,11 @@ if __name__ == '__main__':
                     channel=can_interface, interface='socketcan')
             except OSError:
                 print('Cannot find PiCAN board.')
-                exit()
             if len(sys.argv) >= 3:
                 logfile_name = sys.argv[2]
             obd()
             print("exited obd")
-            rx_tsk_run = False
-            tx_tsk_run = False
-            exit()
         else:  # print usage
             print("Faulty usage\nArguments:\n1:\'replay\' + replay_file\n2:can_link (i.e. \'vcan0', \'can0 etc.) optional: log_file")
-            exit()
-            exit()
     except rospy.ROSInterruptException:
         pass

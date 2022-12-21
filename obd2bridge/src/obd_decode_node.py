@@ -189,6 +189,8 @@ def obd():
                             (message.data[3]*100)/255)					# Conver data to %
 
                     pubmsg = Obd2msg(rpm, speed, throttle)
+                    # Timestamp the pubmsg
+                    pubmsg.header.stamp = rospy.Time.now()
                     logmsg = "{},{},{},{}\n".format(
                         time.time(), rpm, speed, throttle)
                     print(pubmsg)

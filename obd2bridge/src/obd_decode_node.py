@@ -153,6 +153,16 @@ def replay():
         print('\n\rKeyboard interrtupt')
         print(e)
 
+def publish_obd2msg(rpm, speed, throttle, pub):
+    pubmsg = Obd2msg()
+    # Timestamp the message
+    pubmsg.header.stamp = rospy.Time.now()
+    # Fill in the message
+    pubmsg.rpm = rpm
+    pubmsg.speed = speed
+    pubmsg.throttle = throttle
+    # Publish the message
+    pub.publish(pubmsg)
 
 def obd():
     global rx_tsk_run
@@ -173,37 +183,30 @@ def obd():
     throttle = 0
     count = 0
     with open(logfile_name, "a") as logfile:
+        print(f"Logging to {logfile_name}")
+        print(f"Reading from {can_interface}...")
         while not rospy.is_shutdown():
-            try:
-                if not q.empty():  # Wait until there is a message
-                    message = q.get()
+            if not q.empty():  # Wait until there is a message
+                message = q.get()
 
-                    if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_RPM:
-                        # Convert data to RPM
-                        rpm = round(((message.data[3]*256) + message.data[4])/4)
+                if message.arbitration_id == PID_REPLY and message.data[2] == ENGINE_RPM:
+                    # Convert data to RPM
+                    rpm = round(((message.data[3]*256) + message.data[4])/4)
 
-                    if message.arbitration_id == PID_REPLY and message.data[2] == VEHICLE_SPEED:
-                        speed = message.data[3]										# Convert data to km
-                    if message.arbitration_id == PID_REPLY and message.data[2] == THROTTLE:
-                        throttle = round(
-                            (message.data[3]*100)/255)					# Conver data to %
+                if message.arbitration_id == PID_REPLY and message.data[2] == VEHICLE_SPEED:
+                    speed = message.data[3]										# Convert data to km
+                if message.arbitration_id == PID_REPLY and message.data[2] == THROTTLE:
+                    throttle = round(
+                        (message.data[3]*100)/255)					# Conver data to %
 
-                    pubmsg = Obd2msg(rpm, speed, throttle)
-                    # Timestamp the pubmsg
-                    pubmsg.header.stamp = rospy.Time.now()
-                    logmsg = "{},{},{},{}\n".format(
-                        time.time(), rpm, speed, throttle)
-                    print(pubmsg)
-                    logfile.write(logmsg)
-                    #            print(c,file = outfile) # Save data to file
-                    count += 1
-                    pub.publish(pubmsg)
-                    print(pubmsg)
-                rate.sleep()
-            except:
-                print("Keyboard interrupt")
-                break
-    print("Stopping threads")
+                publish_obd2msg(rpm, speed, throttle, pub)
+                logmsg = "{},{},{},{}\n".format(
+                    time.time(), rpm, speed, throttle)
+                logfile.write(logmsg)
+                #            print(c,file = outfile) # Save data to file
+                count += 1
+            rate.sleep()
+    print("Stopping threads...")
     tx.stop()
     rx.stop()
     tx.join()
@@ -229,7 +232,7 @@ if __name__ == '__main__':
             if len(sys.argv) >= 3:
                 logfile_name = sys.argv[2]
             obd()
-            print("exited obd")
+            print("The program exited normally (•̀ᴗ•́)و ̑̑")
         else:  # print usage
             print("Faulty usage\nArguments:\n1:\'replay\' + replay_file\n2:can_link (i.e. \'vcan0', \'can0 etc.) optional: log_file")
     except rospy.ROSInterruptException:

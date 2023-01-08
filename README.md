@@ -6,5 +6,5 @@ This code was made for the IL2232 course at Kungliga Tekniska Högskolan and is 
 
 Contributors list:
 Mattias Lind,
-Zachary McCormick
+Zachary McCormick,
 Matthew Lock

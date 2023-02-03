@@ -81,45 +81,11 @@ def can_rx_task():  # Receive thread
             q.put(message)			# Put message into queue
 
 
-def can_tx_task():  # Transmit thread
-    while True:
-
-        # GPIO.output(led,True)
-        # Sent a Engine coolant temperature request
-        msg = can.Message(arbitration_id=PID_REQUEST, data=[
-                          0x02, 0x01, ENGINE_COOLANT_TEMP, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
-        bus.send(msg)
-        time.sleep(0.05)
-
-        # Sent a Engine RPM request
-        msg = can.Message(arbitration_id=PID_REQUEST, data=[
-                          0x02, 0x01, ENGINE_RPM, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
-        bus.send(msg)
-        time.sleep(0.05)
-
-        # Sent a Vehicle speed  request
-        msg = can.Message(arbitration_id=PID_REQUEST, data=[
-                          0x02, 0x01, VEHICLE_SPEED, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
-        bus.send(msg)
-        time.sleep(0.05)
-
-        # Sent a Throttle position request
-        msg = can.Message(arbitration_id=PID_REQUEST, data=[
-                          0x02, 0x01, THROTTLE, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
-        bus.send(msg)
-        time.sleep(0.05)
-
-        # GPIO.output(led,False)
-        time.sleep(0.1)
-
-
 def obd():
     print("started obd2 fake car")
 
     rx = Thread(target=can_rx_task)
     rx.start()
-    # tx = Thread(target = can_tx_task)
-    # tx.start()
     temperature = 0
     rpm = 0
     speed = 0
@@ -132,24 +98,20 @@ def obd():
                 while (q.empty() == True):  # Wait until there is a message
                     pass
                 message = q.get()
-                # print("got message");
-                # c = '{0:f},{1:d},'.format(message.timestamp,count)
+
                 if message.arbitration_id == PID_REQUEST and message.data[2] == ENGINE_COOLANT_TEMP:
                     msg = can.Message(arbitration_id=PID_REPLY, data=[
                                       0x02, 0x01, ENGINE_COOLANT_TEMP, 0x20, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
                     bus.send(msg)
                     time.sleep(0.05)
-                    # temperature = message.data[3] - 40;			#Convert data into temperature in degree C
 
                 if message.arbitration_id == PID_REQUEST and message.data[2] == ENGINE_RPM:
-                    # rpm = round(((message.data[3]*256) + message.data[4])/4);	# Convert data to RPM
                     msg = can.Message(arbitration_id=PID_REPLY, data=[
                                       0x02, 0x01, ENGINE_RPM, 0x20, 0x10, 0x00, 0x00, 0x00], is_extended_id=False)
                     bus.send(msg)
                     time.sleep(0.05)
 
                 if message.arbitration_id == PID_REQUEST and message.data[1] == 0x22:
-                    # rpm = round(((message.data[3]*256) + message.data[4])/4);	# Convert data to RPM
                     msg = can.Message(arbitration_id=PID_REPLY, data=[
                                       0x05, 0x62, message.data[3], message.data[4], 0xff, 0x00, 0x00, 0x00], is_extended_id=False)
                     bus.send(msg)
@@ -160,28 +122,20 @@ def obd():
                                       0x02, 0x01, VEHICLE_SPEED, 0x43, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
                     bus.send(msg)
                     time.sleep(0.05)
-                    # speed = message.data[3];										# Convert data to km
 
                 if message.arbitration_id == PID_REQUEST and message.data[2] == THROTTLE:
                     msg = can.Message(arbitration_id=PID_REPLY, data=[
                                       0x02, 0x01, THROTTLE, 0x40, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
                     bus.send(msg)
                     time.sleep(0.05)
-                    # throttle = round((message.data[3]*100)/255);					# Conver data to %
 
-            # c += '{0:d},{1:d},{2:d},{3:d}'.format(temperature,rpm,speed,throttle)
-            # print('\r {} '.format(c))
-            # print(c,file = outfile) # Save data to file
             count += 1
 
     except KeyboardInterrupt:
-        # Catch keyboard interrupt
-        # GPIO.output(led,False)
         outfile.close()		# Close logger file
-        # os.system("sudo /sbin/ip link set can0 down")
         print('\n\rKeyboard interrtupt')
 
-
+# Main function, takes 1 argument: name of interface i.e. "vcan0" or "can0"(only in loopback mode)
 if __name__ == '__main__':
     try:
         print(sys.argv)
@@ -197,7 +151,6 @@ if __name__ == '__main__':
                 exit()
         except OSError:
             print('Cannot find PiCAN board.')
-            # GPIO.output(led,False)
             exit()
         obd()
     except rospy.ROSInterruptException:

@@ -65,11 +65,6 @@ can_interface = 'vcan0'
 
 q = queue.Queue()
 
-
-# Bring up can0 interface at 500kbps saved because I sometimes forget the command
-# os.system("sudo /sbin/ip link set vcan0 up type can bitrate 500000")
-# time.sleep(0.1)
-# print('Ready')
 bus = ''
 replay_file = ''
 
@@ -89,14 +84,14 @@ class StoppableThread(threading.Thread):
         self._stop_event.set()
 
 
-def can_rx_task(event):  # Receive thread
+def can_rx_task(event):  # Receive thread for CAN messages
     while not event.is_set():
         message = bus.recv(timeout=0.2)
         if message and message.arbitration_id == PID_REPLY:
             q.put(message)			# Put message into queue
 
 
-def can_tx_task(event, tx_rate):  # Transmit thread
+def can_tx_task(event, tx_rate):  # Transmit thread for CAN messages
     msg_engine_rpm = can.Message(arbitration_id=PID_REQUEST, data=[
                                     0x02, 0x01, ENGINE_RPM, 0x00, 0x00, 0x00, 0x00, 0x00], is_extended_id=False)
     msg_vehicle_speed = can.Message(arbitration_id=PID_REQUEST, data=[
@@ -119,7 +114,7 @@ def can_tx_task(event, tx_rate):  # Transmit thread
         time.sleep(1.0/tx_rate)
 
 
-def replay():
+def replay(): 
     print("replaying")
     try:
         with open(replay_file, "r") as rfile:
@@ -131,20 +126,20 @@ def replay():
 
             while loopvar:
                 line = rfile.readline()
-                if line:
+                if line: # Check that we are not at EOF
+                    # Parse the line into an OBD2 message
                     line = line.replace('\n', '')
                     parts = line.split(',')
                     ntime = float(parts[0])
                     if oldt == 0:
                         time.sleep(0)
                     else:
-                        time.sleep(ntime - oldt)
+                        time.sleep(ntime - oldt) # Preserve the time difference between the messages (as per recording)
                     oldt = ntime
 
                     pubmsg = Obd2msg(parts[1], parts[2], parts[3])
-                    print(pubmsg)
+                    print(pubmsg) #print for visual feedback
                     pub.publish(pubmsg)
-                    # print("{}\nnewline".format(line));
                 else:
                     loopvar = False
     except Exception as e:
@@ -172,16 +167,13 @@ def obd():
     rate = rospy.Rate(TRANSMIT_RATE)
     print("started obd2 logger")
     useful_pid = [0] * (0xff*0xff)
-    rx = StoppableThread(can_rx_task)
+    rx = StoppableThread(can_rx_task) # Start CAN RX thread
     rx.start()
-    tx = StoppableThread(can_tx_task, TRANSMIT_RATE)
+    tx = StoppableThread(can_tx_task, TRANSMIT_RATE) # Start CAN TX thread
     tx.start()
-    temperature = 0
     rpm = 0
     speed = 0
-
     throttle = 0
-    count = 0
     with open(logfile_name, "a") as logfile:
         print(f"Logging to {logfile_name}")
         print(f"Reading from {can_interface}...")
@@ -194,35 +186,29 @@ def obd():
                     rpm = round(((message.data[3]*256) + message.data[4])/4)
 
                 if message.arbitration_id == PID_REPLY and message.data[2] == VEHICLE_SPEED:
-                    speed = message.data[3]										# Convert data to km
+                    speed = message.data[3] # Convert data to kM/h
+                    
                 if message.arbitration_id == PID_REPLY and message.data[2] == THROTTLE:
                     throttle = round(
-                        (message.data[3]*100)/255)					# Conver data to %
+                        (message.data[3]*100)/255)# Convert Throttle from x/255ths to %
 
-                publish_obd2msg(rpm, speed, throttle, pub)
-                logmsg = "{},{},{},{}\n".format(
-                    time.time(), rpm, speed, throttle)
-                logfile.write(logmsg)
-                #            print(c,file = outfile) # Save data to file
-                count += 1
+                publish_obd2msg(rpm, speed, throttle, pub) # Publish message, header & timestamp is added in the function
+                logmsg = "{},{},{},{}\n".format(time.time(), rpm, speed, throttle) # Format for local file logging
+                logfile.write(logmsg) # Log to file
             rate.sleep()
     print("Stopping threads...")
-    tx.stop()
+    tx.stop() # Stop threads
     rx.stop()
-    tx.join()
+    tx.join() # Wait for threads to finish
     rx.join()
 
-
+# Main function
 if __name__ == '__main__':
     try:
-        if (len(sys.argv) >= 3 and sys.argv[1] == "replay"):  # replay mode
-            replay_file = sys.argv[2]
-          #  timen = time.time();
-           # time.sleep(3);
-            # timed = time.time() - timen ;
-            # print("{},{}".format(timen,timed));
-            replay()
-        elif len(sys.argv) >= 2:  # collection mode
+        if (len(sys.argv) >= 3 and sys.argv[1] == "replay"):  # Replay mode
+            replay_file = sys.argv[2] # File to replay from
+            replay() # Start replay mode
+        elif len(sys.argv) >= 2:  # Collection mode
             can_interface = sys.argv[1]
             try:
                 bus = can.interface.Bus(
@@ -233,7 +219,7 @@ if __name__ == '__main__':
                 logfile_name = sys.argv[2]
             obd()
             print("The program exited normally (•̀ᴗ•́)و ̑̑")
-        else:  # print usage
+        else:  # Print usage
             print("Faulty usage\nArguments:\n1:\'replay\' + replay_file\n2:can_link (i.e. \'vcan0', \'can0 etc.) optional: log_file")
     except rospy.ROSInterruptException:
         pass
